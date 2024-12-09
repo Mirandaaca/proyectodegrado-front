@@ -1,12 +1,16 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, signal } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { SidebarComponent } from './shared/components/layout/sidebar/sidebar.component';
+import { NavbarComponent } from './shared/components/layout/navbar/navbar.component';
+import { SidebarService } from './shared/services/sidebar.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'frontend';
+  constructor(public sidebarService: SidebarService) {}
 }

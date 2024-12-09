@@ -1,0 +1,129 @@
+<!-- menu-lateral.component.html -->
+<div class="bg-white rounded-lg shadow-lg">
+    <mat-accordion multi>
+      <!-- Citas de Hoy -->
+      <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+          <mat-panel-title class="flex items-center gap-2">
+            <mat-icon>today</mat-icon>
+            <span>Citas de Hoy</span>
+            @if (citasHoy.length > 0) {
+              <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">
+                {{citasHoy.length}}
+              </span>
+            }
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+  
+        <div class="space-y-2 mt-2">
+          @if (citasHoy.length === 0) {
+            <p class="text-gray-500 text-sm text-center py-4">No hay citas para hoy</p>
+          }
+          @for (cita of citasHoy; track cita.id) {
+            <div class="p-3 rounded-lg cursor-pointer hover:shadow-md transition-all"
+                 [style.background-color]="cita.color + '20'"
+                 [style.border-left]="'4px solid ' + cita.color"
+                 (click)="verDetallesCita(cita)"
+                 @fadeIn>
+              <div class="flex flex-col">
+                <span class="font-medium">{{cita.asunto}}</span>
+                <span class="text-sm text-gray-600">{{formatearHoraCita(cita)}}</span>
+                <span class="text-sm text-gray-600">{{cita.nombrePostulante}}</span>
+                <span class="text-xs mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full"
+                      [class.bg-blue-100]="cita.modalidad === 'Virtual'"
+                      [class.text-blue-800]="cita.modalidad === 'Virtual'"
+                      [class.bg-green-100]="cita.modalidad === 'Presencial'"
+                      [class.text-green-800]="cita.modalidad === 'Presencial'">
+                  {{cita.modalidad}}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-expansion-panel>
+  
+      <!-- Citas de Mañana -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title class="flex items-center gap-2">
+            <mat-icon>event</mat-icon>
+            <span>Citas de Mañana</span>
+            @if (citasManana.length > 0) {
+              <span class="ml-2 px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
+                {{citasManana.length}}
+              </span>
+            }
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+  
+        <div class="space-y-2 mt-2">
+          @if (citasManana.length === 0) {
+            <p class="text-gray-500 text-sm text-center py-4">No hay citas para mañana</p>
+          }
+          @for (cita of citasManana; track cita.id) {
+            <div class="p-3 rounded-lg cursor-pointer hover:shadow-md transition-all"
+                 [style.background-color]="cita.color + '20'"
+                 [style.border-left]="'4px solid ' + cita.color"
+                 (click)="verDetallesCita(cita)"
+                 @fadeIn>
+              <div class="flex flex-col">
+                <span class="font-medium">{{cita.asunto}}</span>
+                <span class="text-sm text-gray-600">{{formatearHoraCita(cita)}}</span>
+                <span class="text-sm text-gray-600">{{cita.nombrePostulante}}</span>
+                <span class="text-xs mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full"
+                      [class.bg-blue-100]="cita.modalidad === 'Virtual'"
+                      [class.text-blue-800]="cita.modalidad === 'Virtual'"
+                      [class.bg-green-100]="cita.modalidad === 'Presencial'"
+                      [class.text-green-800]="cita.modalidad === 'Presencial'">
+                  {{cita.modalidad}}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-expansion-panel>
+  
+      <!-- Citas de la Semana -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title class="flex items-center gap-2">
+            <mat-icon>date_range</mat-icon>
+            <span>Citas de la Semana</span>
+            @if (citasSemana.length > 0) {
+              <span class="ml-2 px-2 py-0.5 bg-orange-100 text-orange-800 rounded-full text-xs">
+                {{citasSemana.length}}
+              </span>
+            }
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+  
+        <div class="space-y-2 mt-2">
+          @if (citasSemana.length === 0) {
+            <p class="text-gray-500 text-sm text-center py-4">No hay citas para esta semana</p>
+          }
+          @for (cita of citasSemana; track cita.id) {
+            <div class="p-3 rounded-lg cursor-pointer hover:shadow-md transition-all"
+                 [style.background-color]="cita.color + '20'"
+                 [style.border-left]="'4px solid ' + cita.color"
+                 (click)="verDetallesCita(cita)"
+                 @fadeIn>
+              <div class="flex flex-col">
+                <span class="font-medium">{{cita.asunto}}</span>
+                <span class="text-sm text-gray-600">
+                  {{cita.horaInicio | date:'EEEE d':'':'es'}} • {{formatearHoraCita(cita)}}
+                </span>
+                <span class="text-sm text-gray-600">{{cita.nombrePostulante}}</span>
+                <span class="text-xs mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full"
+                      [class.bg-blue-100]="cita.modalidad === 'Virtual'"
+                      [class.text-blue-800]="cita.modalidad === 'Virtual'"
+                      [class.bg-green-100]="cita.modalidad === 'Presencial'"
+                      [class.text-green-800]="cita.modalidad === 'Presencial'">
+                  {{cita.modalidad}}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>

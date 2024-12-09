@@ -1,0 +1,11 @@
+<div class="min-h-screen bg-gray-50">
+    <app-navbar />
+    <app-sidebar />
+    <main class="transition-all duration-300"
+          [class.ml-64]="!sidebarService.getCollapsedState()()"
+          [class.ml-20]="sidebarService.getCollapsedState()()">
+      <div class="p-6 pt-24">
+        <router-outlet />
+      </div>
+    </main>
+  </div>

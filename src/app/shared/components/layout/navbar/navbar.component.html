@@ -1,0 +1,37 @@
+<nav class="fixed left-0 right-0 top-0 z-40 border-b border-gray-200 bg-white">
+    <div class="flex h-16 items-center justify-between px-4">
+      <!-- Left section -->
+      <div class="flex items-center gap-4">
+        <button (click)="sidebarService.toggleSidebar()"
+                class="rounded-lg p-2 hover:bg-gray-100">
+          <i class="material-icons-outlined">menu</i>
+        </button>
+        <div class="flex items-center gap-2">
+          <img src="logoueb.jpeg" alt="Logo" class="h-8 w-8">
+          <span class="text-xl font-bold text-gray-800">UEB Psico</span>
+        </div>
+      </div>
+
+      <!-- Right section -->
+      <div class="flex items-center gap-4">
+        <!-- Notifications -->
+        <button class="relative rounded-full p-2 hover:bg-gray-100">
+          <i class="material-icons-outlined">notifications</i>
+          <span class="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+            2
+          </span>
+        </button>
+
+        <!-- User Menu -->
+        <div class="flex items-center gap-3">
+          <img src="logoueb.jpeg" 
+               alt="User avatar"
+               class="h-8 w-8 rounded-full object-cover">
+          <div class="hidden flex-col sm:flex">
+            <span class="text-sm font-medium text-gray-700">Cristopher Miranda</span>
+            <span class="text-xs text-gray-500">Psicólogo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>

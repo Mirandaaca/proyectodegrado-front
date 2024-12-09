@@ -1,0 +1,86 @@
+<div class="bg-white rounded-lg shadow">
+    <!-- Header más compacto -->
+    <div class="flex justify-between items-center p-4 border-b">
+      <h1 class="text-xl font-semibold text-gray-800">Postulantes</h1>
+      <button 
+        routerLink="/app/parametrosyconfigs/postulantes/crear"
+        class="flex items-center gap-2 px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+        [@scaleIn]
+      >
+        <mat-icon class="!h-5 !w-5 !text-base">add</mat-icon>
+        Nuevo Postulante
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table mat-table [dataSource]="dataSource" matSort class="w-full">
+        <!-- Ajuste de las columnas para ser más compactas -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-50 py-3"> Nombre </th>
+          <td mat-cell *matCellDef="let element" class="py-2"> 
+            {{element.nombre}} {{element.apellido}}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-50 py-3"> Email </th>
+          <td mat-cell *matCellDef="let element" class="py-2"> {{element.email}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="telefono">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-50 py-3"> Teléfono </th>
+          <td mat-cell *matCellDef="let element" class="py-2"> {{element.telefono}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="habilitado">
+          <th mat-header-cell *matHeaderCellDef class="bg-gray-50 py-3"> Estado </th>
+          <td mat-cell *matCellDef="let element" class="py-2">
+            <span 
+              class="px-2 py-0.5 rounded-full text-xs font-medium"
+              [class.bg-green-100]="element.habilitado"
+              [class.text-green-800]="element.habilitado"
+              [class.bg-red-100]="!element.habilitado"
+              [class.text-red-800]="!element.habilitado"
+            >
+              {{element.habilitado ? 'Activo' : 'Inactivo'}}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="bg-gray-50 py-3"> Acciones </th>
+          <td mat-cell *matCellDef="let element" class="py-2">
+            <div class="flex gap-1">
+              <button 
+                mat-icon-button 
+                color="primary"
+                [routerLink]="['/app/parametrosyconfigs/postulantes/editar', element.id]"
+                class="!h-8 !w-8 hover:bg-primary-50"
+              >
+                <mat-icon class="!h-5 !w-5 !text-base">edit</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="warn"
+                (click)="eliminarPostulante(element.id!)"
+                class="!h-8 !w-8 hover:bg-red-50"
+              >
+                <mat-icon class="!h-5 !w-5 !text-base">delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnasAMostrar"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasAMostrar;" class="hover:bg-gray-50"></tr>
+      </table>
+
+      <mat-paginator 
+        [length]="totalRegistros"
+        [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25]"
+        class="border-t"
+      >
+      </mat-paginator>
+    </div>
+  </div>

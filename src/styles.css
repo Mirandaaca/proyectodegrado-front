@@ -1,1 +1,120 @@
-/* You can add global styles to this file, and also import other style files */
+/*@import '@angular/materia/prebuilt-themes/azure-blue.css';*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* Ajustar el espacio del label */
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-form-field-infix {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+  
+/* Corregir la apariencia de los inputs de Material */
+/* Ajustar la altura de los inputs */
+.mat-mdc-form-field-infix {
+    min-height: 40px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+/* Ajustar el estilo del outline */
+.mat-mdc-form-field-flex {
+    background-color: transparent !important;
+  }
+/* Eliminar líneas que atraviesan los inputs */
+.mdc-notched-outline__notch {
+    border-right: none !important;
+  }
+.mat-mdc-form-field-outline-thick {
+    border-width: 1px !important;
+  }
+  
+  .mat-mdc-form-field-subscript-wrapper {
+    height: 0 !important;
+  }
+  
+  /* Hacer los inputs más compactos */
+  .mat-mdc-form-field {
+    line-height: 1.2 !important;
+  }
+  
+  .mat-mdc-text-field-wrapper {
+    padding-bottom: 0 !important;
+  }
+  
+  .mat-mdc-form-field-infix {
+    min-height: 40px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+/* Estilos para las notificaciones */
+.mat-snack-bar-container {
+  margin: 1rem !important;
+  padding: 1rem !important;
+  border-radius: 0.5rem !important;
+}
+
+.bg-green-500 {
+  background-color: #10B981 !important;
+}
+
+.bg-red-500 {
+  background-color: #EF4444 !important;
+}
+
+.bg-blue-500 {
+  background-color: #3B82F6 !important;
+}
+/* Estilos personalizados para SweetAlert2 */
+.custom-swal-container {
+  z-index: 1500 !important;
+}
+
+.custom-swal-popup {
+  border-radius: 1rem !important;
+  padding: 1rem !important;
+}
+
+.custom-swal-title {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+.custom-swal-confirm {
+  padding: 0.5rem 1.5rem !important;
+  border-radius: 0.5rem !important;
+  font-weight: 500 !important;
+}
+
+.custom-swal-cancel {
+  padding: 0.5rem 1.5rem !important;
+  border-radius: 0.5rem !important;
+  font-weight: 500 !important;
+}
+
+/* Personalización de la barra de progreso */
+.swal2-timer-progress-bar {
+  background: rgba(255, 255, 255, 0.5) !important;
+}
+/* styles.css */
+.error-popup {
+  border-radius: 1rem !important;
+  padding: 1.5rem !important;
+}
+
+.error-title {
+  color: #EF4444 !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+.error-content {
+  margin-top: 1rem !important;
+  text-align: left !important;
+}
+
+.error-confirm-button {
+  padding: 0.5rem 2rem !important;
+  font-weight: 500 !important;
+  border-radius: 0.5rem !important;
+}

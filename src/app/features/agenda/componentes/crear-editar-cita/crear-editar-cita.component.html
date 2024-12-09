@@ -1,0 +1,136 @@
+<div class="p-6">
+    <div class="flex justify-between items-start mb-6">
+      <h2 class="text-2xl font-bold">{{ editando ? 'Editar' : 'Nueva' }} Cita</h2>
+      <button mat-icon-button (click)="cerrar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <!-- Datos básicos -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <!-- Asunto -->
+        <mat-form-field appearance="outline" class="col-span-2">
+          <mat-label>Asunto</mat-label>
+          <input matInput formControlName="asunto" placeholder="Ingrese el asunto">
+          @if (form.get('asunto')?.hasError('required') && form.get('asunto')?.touched) {
+            <mat-error>El asunto es requerido</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Postulante -->
+        <mat-form-field appearance="outline" class="col-span-2">
+          <mat-label>Postulante</mat-label>
+          <input matInput [matAutocomplete]="auto" formControlName="nombrePostulante" 
+                 placeholder="Buscar postulante">
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="seleccionarPostulante($event)">
+            @for (postulante of postulantes$ | async; track postulante.id) {
+              <mat-option [value]="postulante">
+                {{ postulante.nombre }} {{ postulante.apellido }}
+              </mat-option>
+            }
+          </mat-autocomplete>
+          @if (form.get('idPostulante')?.hasError('required') && form.get('idPostulante')?.touched) {
+            <mat-error>El postulante es requerido</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Fecha -->
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="fecha"
+                 [min]="minDate" placeholder="Seleccione una fecha">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          @if (form.get('fecha')?.hasError('required') && form.get('fecha')?.touched) {
+            <mat-error>La fecha es requerida</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Modalidad -->
+        <mat-form-field appearance="outline">
+          <mat-label>Modalidad</mat-label>
+          <mat-select formControlName="modalidad">
+            <mat-option value="Virtual">Virtual</mat-option>
+            <mat-option value="Presencial">Presencial</mat-option>
+          </mat-select>
+          @if (form.get('modalidad')?.hasError('required') && form.get('modalidad')?.touched) {
+            <mat-error>La modalidad es requerida</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Hora Inicio -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Hora de Inicio -->
+  <mat-form-field appearance="outline">
+    <mat-label>Hora de Inicio</mat-label>
+    <mat-select formControlName="horaInicio">
+      @for (hora of getHorasSegunModalidad(); track hora.valor) {
+        <mat-option [value]="hora.valor">
+          {{ hora.texto }}
+        </mat-option>
+      }
+    </mat-select>
+    @if (form.get('horaInicio')?.errors?.['horaInvalida'] && form.get('horaInicio')?.touched) {
+      <mat-error>{{form.get('horaInicio')?.errors?.['horaInvalida']}}</mat-error>
+    }
+  </mat-form-field>
+        <!-- Hora Fin -->
+        <mat-form-field appearance="outline">
+            <mat-label>Hora de Fin</mat-label>
+            <mat-select formControlName="horaFin" [disabled]="!form.get('horaInicio')?.value">
+              @for (hora of getHorasFinDisponibles(); track hora.valor) {
+                <mat-option [value]="hora.valor">
+                  {{ hora.texto }}
+                </mat-option>
+              }
+            </mat-select>
+            @if (form.get('horaFin')?.errors?.['horaInvalida'] && form.get('horaFin')?.touched) {
+              <mat-error>{{form.get('horaFin')?.errors?.['horaInvalida']}}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+        
+        @if (form.errors?.['rangoInvalido']) {
+          <div class="text-red-500 text-xs mt-1">
+            {{form.errors?.['rangoInvalido']}}
+          </div>
+        }
+
+        <!-- Lugar -->
+        <mat-form-field appearance="outline" class="col-span-2">
+          <mat-label>Lugar</mat-label>
+          <input matInput formControlName="lugar" placeholder="Ingrese el lugar">
+          @if (form.get('lugar')?.hasError('required') && form.get('lugar')?.touched) {
+            <mat-error>El lugar es requerido</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Color -->
+        <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-700">Color de la cita</label>
+            <div class="flex flex-wrap gap-4 mt-2">
+              @for (color of colores; track color.valor) {
+                <button type="button"
+                        class="w-8 h-8 rounded-full transition-transform hover:scale-110 focus:outline-none relative"
+                        [style.background-color]="color.valor"
+                        (click)="form.patchValue({color: color.valor})"
+                        matTooltip="{{color.nombre}}">
+                  @if (form.get('color')?.value === color.valor) {
+                    <div class="absolute inset-0 rounded-full ring-2 ring-offset-2 ring-blue-500"></div>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" mat-stroked-button (click)="cerrar()">
+          Cancelar
+        </button>
+        <button type="submit" mat-flat-button color="primary" [disabled]="form.invalid">
+          {{ editando ? 'Actualizar' : 'Crear' }}
+        </button>
+      </div>
+  </div>

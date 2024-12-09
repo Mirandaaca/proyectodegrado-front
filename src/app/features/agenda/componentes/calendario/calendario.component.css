@@ -1,0 +1,68 @@
+/* calendario.component.css */
+:host {
+    display: block;
+    height: 100%;
+  }
+  
+  /* Estilos para el scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+  
+  /* Animación para hover en las citas */
+  .group:hover {
+    @apply bg-gray-50;
+  }
+  
+  /* Estilos para las citas */
+  .cita {
+    @apply absolute inset-x-0 m-1 rounded-lg p-2 text-sm cursor-pointer 
+           hover:shadow-lg transition-shadow overflow-hidden;
+  }
+  
+  /* Ajustes para vista móvil */
+  @media (max-width: 640px) {
+    .calendario-grid {
+      @apply grid-cols-1;
+    }
+    
+    .hora-columna {
+      @apply w-12;
+    }
+  }
+  
+  /* Mejoras visuales para la vista actual */
+  .vista-actual {
+    @apply border-b-2 border-blue-500;
+  }
+  
+  /* Estilos para el día actual */
+  .dia-actual {
+    @apply bg-blue-50 font-semibold;
+  }
+  
+  /* Estilos para la hora actual */
+  .hora-actual {
+    @apply bg-blue-100;
+  }
+  
+  /* Animaciones adicionales */
+  .hover-scale {
+    @apply transition-transform duration-200;
+  }
+  
+  .hover-scale:hover {
+    @apply transform scale-105;
+  }

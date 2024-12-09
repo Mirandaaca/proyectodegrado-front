@@ -1,0 +1,85 @@
+<aside 
+      class="fixed left-0 top-16 z-30 h-[calc(100vh-4rem)] overflow-hidden bg-white transition-all duration-300"
+      [class.w-64]="!sidebarService.getCollapsedState()()"
+      [class.w-16]="sidebarService.getCollapsedState()()"
+    >
+      <div class="flex h-full flex-col border-r border-gray-200">
+        <nav class="flex-1 space-y-1 p-4">
+          @for (item of menuItems(); track item.label) {
+            <div class="nav-item">
+              <!-- Menu Item -->
+              <div 
+  class="group relative flex h-12 cursor-pointer items-center gap-3 rounded-lg px-3 transition-all duration-200 hover:bg-gray-100"
+  [class.justify-center]="sidebarService.getCollapsedState()()"
+  [class.bg-primary-50]="isRouteActive(item.route!)"
+  [routerLink]="item.subItems ? null : item.route"
+  (click)="item.subItems ? toggleMenu(item) : null"
+>
+                <!-- Icon -->
+                <i class="material-icons-outlined text-xl"
+                   [class.text-primary-600]="isRouteActive(item.route!)">
+                  {{item.icon}}
+                </i>
+                
+                <!-- Label and expand icon when not collapsed -->
+                <div class="flex w-full items-center justify-between overflow-hidden whitespace-nowrap transition-all duration-300"
+                     [class.w-0]="sidebarService.getCollapsedState()()"
+                     [class.opacity-0]="sidebarService.getCollapsedState()()">
+                  <span class="text-sm font-medium" 
+                        [class.text-primary-600]="isRouteActive(item.route!)">
+                    {{item.label}}
+                  </span>
+                  @if (item.subItems) {
+                    <i class="material-icons-outlined transition-transform duration-300"
+                       [class.rotate-180]="item.expanded">
+                      expand_more
+                    </i>
+                  }
+                </div>
+
+                <!-- Tooltip when collapsed -->
+                @if (sidebarService.getCollapsedState()()) {
+                  <div class="absolute left-full top-0 z-50 ml-2 hidden h-12 items-center rounded-md bg-gray-800 px-3 py-2 text-sm text-white group-hover:flex">
+                    {{item.label}}
+                  </div>
+                }
+              </div>
+              
+              <!-- Submenu -->
+              @if (item.subItems && item.expanded && !sidebarService.getCollapsedState()()) {
+                <div class="mt-1 space-y-1 overflow-hidden pl-11">
+                  @for (subItem of item.subItems; track subItem.label) {
+                    <a [routerLink]="['/app' + item.route, subItem.route]"
+                       class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-all duration-200 hover:bg-gray-100"
+                       [class.bg-primary-50]="isRouteActive(subItem.route!)"
+                       [class.text-primary-600]="isRouteActive(subItem.route!)">
+                      <i class="material-icons-outlined text-lg">{{subItem.icon}}</i>
+                      <span class="whitespace-nowrap">{{subItem.label}}</span>
+                    </a>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </nav>
+
+        <!-- Logout button -->
+        <div class="border-t border-gray-200 p-4">
+          <button (click)="logout()"
+                  class="group relative flex h-12 w-full items-center gap-3 rounded-lg px-3 text-red-600 transition-all duration-200 hover:bg-red-50"
+                  [class.justify-center]="sidebarService.getCollapsedState()()">
+            <i class="material-icons-outlined">logout</i>
+            <span class="overflow-hidden whitespace-nowrap transition-all duration-300"
+                  [class.w-0]="sidebarService.getCollapsedState()()"
+                  [class.opacity-0]="sidebarService.getCollapsedState()()">
+              Cerrar Sesión
+            </span>
+            @if (sidebarService.getCollapsedState()()) {
+              <div class="absolute left-full top-0 z-50 ml-2 hidden h-12 items-center rounded-md bg-gray-800 px-3 py-2 text-sm text-white group-hover:flex">
+                Cerrar Sesión
+              </div>
+            }
+          </button>
+        </div>
+      </div>
+    </aside>

@@ -1,0 +1,99 @@
+ <div class="p-6 bg-white rounded-lg shadow-lg max-w-3xl mx-auto" [@formAnimation]>
+      <div class="flex items-center gap-4 mb-8">
+        <button 
+          mat-icon-button 
+          routerLink="/app/parametrosyconfigs/postulantes"
+          class="hover:bg-gray-100 transition-colors"
+        >
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1 class="text-2xl font-bold text-gray-800">
+          {{modelo ? 'Editar' : 'Nuevo'}} Postulante
+        </h1>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="guardarCambios()" class="space-y-6">
+        <!-- Nombre y Apellido -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+            <mat-error *ngIf="form.get('nombre')?.hasError('required')">
+              El nombre es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido" placeholder="Ingrese el apellido">
+            <mat-error *ngIf="form.get('apellido')?.hasError('required')">
+              El apellido es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Email y Teléfono -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email" placeholder="ejemplo@correo.com">
+            <mat-error *ngIf="form.get('email')?.hasError('required')">
+              El email es requerido
+            </mat-error>
+            <mat-error *ngIf="form.get('email')?.hasError('email')">
+              Ingrese un email válido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono" placeholder="+591 ">
+          </mat-form-field>
+        </div>
+
+        <!-- Dirección -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Dirección</mat-label>
+          <input matInput formControlName="direccion" placeholder="Ingrese la dirección">
+        </mat-form-field>
+
+        <!-- Fecha de Nacimiento y Grado de Formación -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Fecha de Nacimiento</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="fechaDeNacimiento">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="form.get('fechaDeNacimiento')?.hasError('required')">
+              La fecha de nacimiento es requerida
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Grado de Formación</mat-label>
+            <input matInput formControlName="gradoDeFormacion" placeholder="Ingrese el grado de formación">
+          </mat-form-field>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex justify-end gap-4 pt-4">
+          <button 
+            type="button"
+            mat-stroked-button 
+            routerLink="/app/parametrosyconfigs/postulantes"
+            class="hover:bg-gray-50 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit"
+            mat-flat-button 
+            color="primary"
+            [disabled]="!form.valid || form.pristine"
+            class="px-6"
+          >
+            {{modelo ? 'Actualizar' : 'Guardar'}}
+          </button>
+        </div>
+      </form>
+    </div>

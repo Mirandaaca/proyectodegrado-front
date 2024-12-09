@@ -1,0 +1,69 @@
+<div class="p-6">
+    <!-- Cabecera -->
+    <div class="flex justify-between items-start mb-6">
+      <div>
+        <h2 class="text-2xl font-bold" [style.color]="cita.color">{{ cita.asunto }}</h2>
+        <p class="text-gray-600">{{ cita.estado }}</p>
+      </div>
+      <button mat-icon-button (click)="cerrar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Detalles principales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">Fecha y Hora</h3>
+        <div class="flex items-center gap-2">
+          <mat-icon class="text-gray-400">event</mat-icon>
+          <span>{{ cita.horaInicio | date:'fullDate':'':'es' }}</span>
+        </div>
+        <div class="flex items-center gap-2 mt-1">
+          <mat-icon class="text-gray-400">schedule</mat-icon>
+          <span>
+            {{ cita.horaInicio | date:'shortTime' }} - {{ cita.horaFin | date:'shortTime' }}
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">Modalidad</h3>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm"
+              [class.bg-blue-100]="cita.modalidad === 'Virtual'"
+              [class.text-blue-800]="cita.modalidad === 'Virtual'"
+              [class.bg-green-100]="cita.modalidad === 'Presencial'"
+              [class.text-green-800]="cita.modalidad === 'Presencial'">
+          <mat-icon class="mr-1 text-sm">
+            {{ cita.modalidad === 'Virtual' ? 'computer' : 'location_on' }}
+          </mat-icon>
+          {{ cita.modalidad }}
+        </span>
+        @if (cita.lugar) {
+          <p class="mt-1 text-gray-600">{{ cita.lugar }}</p>
+        }
+      </div>
+    </div>
+
+    <!-- Información del postulante -->
+    <div class="mb-6">
+      <h3 class="text-sm font-medium text-gray-500 mb-2">Postulante</h3>
+      <div class="p-4 bg-gray-50 rounded-lg">
+        <p class="font-medium">{{ cita.nombrePostulante }}</p>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="flex justify-end gap-2 mt-8">
+      <button mat-stroked-button color="warn" (click)="eliminarCita()">
+        <mat-icon>delete</mat-icon>
+        Eliminar
+      </button>
+      <button mat-stroked-button (click)="editarCita()">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+      <button mat-flat-button color="primary" (click)="cerrar()">
+        Cerrar
+      </button>
+    </div>
+  </div>

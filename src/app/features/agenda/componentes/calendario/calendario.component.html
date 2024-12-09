@@ -1,0 +1,288 @@
+<div class="h-full flex flex-col bg-white rounded-lg shadow-sm">
+  <!-- Cabecera -->
+  <div class="p-4 border-b">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <button mat-icon-button (click)="cambiarMes(-1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <h2 class="text-xl font-semibold">{{ formatearFechaCabecera() }}</h2>
+          <button mat-icon-button (click)="cambiarMes(1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button mat-button (click)="irAHoy()">Hoy</button>
+        <mat-button-toggle-group [value]="vistaActual" (change)="onVistaChange($event)">
+          <mat-button-toggle value="dia">Día</mat-button-toggle>
+          <mat-button-toggle value="semana">Semana</mat-button-toggle>
+          <mat-button-toggle value="mes">Mes</mat-button-toggle>
+        </mat-button-toggle-group>
+        <button mat-flat-button color="primary" (click)="crearNuevaCita()">
+          <mat-icon>add</mat-icon>
+          Nueva Cita
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor principal -->
+  <div class="flex-1 flex">
+    <!-- Área del calendario -->
+    <div class="flex-1 overflow-auto">
+      @if (vistaActual === 'dia') {
+        <div class="flex-1 overflow-y-auto">
+          <div class="grid grid-cols-1 h-full">
+            @for (hora of horasDelDia; track trackByHora($index, hora)) {
+              <div class="flex min-h-[60px] border-b border-gray-100">
+                <div class="w-20 py-2 px-3 text-sm text-gray-500 text-right border-r">
+                  {{ formatearHora(hora) }}
+                </div>
+                <div class="flex-1 relative">
+                  @for (cita of obtenerCitasParaHora(hora, fechaActual()); track trackByCita($index, cita)) {
+                    <div class="absolute left-0 right-0 mx-2 rounded p-2 cursor-pointer hover:shadow-lg transition-all"
+                         [style.top.%]="calcularPosicionTop(cita.horaInicio)"
+                         [style.height.%]="calcularAltura(cita.horaInicio, cita.horaFin)"
+                         [style.background-color]="cita.color"
+                         (click)="verDetallesCita(cita)">
+                      <div class="font-medium text-white">{{ cita.asunto }}</div>
+                      <div class="text-xs text-white opacity-90">{{ cita.nombrePostulante }}</div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      } @else if (vistaActual === 'semana') {
+        <div class="flex-1 overflow-y-auto">
+          <div class="grid grid-cols-8 border-b">
+            <div class="w-20 p-4"></div>
+            @for (dia of semanaActual(); track dia) {
+              <div class="p-4 text-center border-l" [class.bg-blue-50]="esFechaActual(dia)">
+                <div class="text-sm text-gray-600">{{ diasDeLaSemana[dia.getDay()] }}</div>
+                <div class="text-xl font-medium" [class.text-blue-600]="esFechaActual(dia)">
+                  {{ dia | date:'d' }}
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="grid grid-cols-8">
+            <div class="w-20">
+              @for (hora of horasDelDia; track hora) {
+                <div class="h-[60px] p-2 text-right text-sm text-gray-500 border-b">
+                  {{ formatearHora(hora) }}
+                </div>
+              }
+            </div>
+
+            @for (dia of semanaActual(); track dia) {
+              <div class="border-l">
+                @for (hora of horasDelDia; track hora) {
+                  <div class="relative h-[60px] border-b">
+                    @for (cita of obtenerCitasParaHora(hora, dia); track cita.id) {
+                      <div class="absolute left-0 right-0 mx-1 rounded p-2 cursor-pointer hover:shadow-lg transition-all"
+                           [style.top.%]="calcularPosicionTop(cita.horaInicio)"
+                           [style.height.%]="calcularAltura(cita.horaInicio, cita.horaFin)"
+                           [style.background-color]="cita.color"
+                           (click)="verDetallesCita(cita)">
+                        <div class="font-medium text-white">{{ cita.asunto }}</div>
+                        <div class="text-xs text-white opacity-90">{{ cita.nombrePostulante }}</div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      } @else if (vistaActual === 'mes') {
+        <div class="flex-1 overflow-y-auto p-4">
+          <div class="grid grid-cols-7 mb-2">
+            @for (dia of diasDeLaSemana; track trackByDiaString($index, dia)) {
+              <div class="text-center py-2 text-sm font-medium text-gray-600">
+                {{ dia }}
+              </div>
+            }
+          </div>
+
+          <div class="grid grid-cols-7 gap-2">
+            @for (dia of diasDelMes(); track trackByDia($index, dia)) {
+              <div class="min-h-[120px] p-2 border rounded-lg relative hover:bg-gray-50 transition-colors cursor-pointer"
+                   [class.bg-gray-50]="dia.getMonth() !== fechaActual().getMonth()"
+                   [class.bg-blue-50]="esFechaActual(dia)"
+                   (click)="navegarADia(dia)">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-sm font-medium"
+                        [class.text-gray-400]="dia.getMonth() !== fechaActual().getMonth()"
+                        [class.text-blue-600]="esFechaActual(dia)">
+                    {{ dia | date:'d' }}
+                  </span>
+                </div>
+
+                <div class="space-y-1 max-h-[80px] overflow-y-auto">
+                  @for (cita of obtenerCitasDelDia(dia); track cita.id) {
+                    <div class="text-xs p-1 rounded cursor-pointer truncate hover:shadow-md transition-shadow"
+                         [style.background-color]="cita.color"
+                         [style.color]="'white'"
+                         (click)="$event.stopPropagation(); verDetallesCita(cita)">
+                      {{ cita.horaInicio | date:'HH:mm' }} - {{ cita.asunto }}
+                    </div>
+                  }
+                  @if (obtenerCitasDelDia(dia).length > 3) {
+                    <div class="text-xs text-gray-600 text-center">
+                      +{{ obtenerCitasDelDia(dia).length - 3 }} más
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Menú lateral -->
+<div class="w-80 border-l bg-white overflow-y-auto">
+  <!-- Acordeón de citas -->
+  <mat-accordion>
+    <!-- Panel de Citas de Hoy -->
+    <mat-expansion-panel expanded>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="flex items-center gap-2">
+            <mat-icon>today</mat-icon>
+            <span class="font-medium">Citas de Hoy</span>
+            @if (citasHoy.length > 0) {
+              <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">
+                {{citasHoy.length}}
+              </span>
+            }
+          </div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="space-y-2 mt-2">
+        @if (citasHoy.length === 0) {
+          <p class="text-gray-500">No hay citas para hoy</p>
+        }
+        @for (cita of citasHoy; track cita.id) {
+          <div class="p-3 rounded-lg cursor-pointer hover:shadow-md transition-all"
+               [style.background-color]="cita.color + '20'"
+               [style.border-left]="'4px solid ' + cita.color"
+               (click)="verDetallesCita(cita)">
+            <div class="flex flex-col">
+              <span class="font-medium">{{cita.asunto}}</span>
+              <span class="text-sm text-gray-600">
+                {{cita.horaInicio | date:'HH:mm'}} - {{cita.horaFin | date:'HH:mm'}}
+              </span>
+              <span class="text-sm text-gray-600">{{cita.nombrePostulante}}</span>
+              <span class="text-xs mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full"
+                    [class.bg-blue-100]="cita.modalidad === 'Virtual'"
+                    [class.text-blue-800]="cita.modalidad === 'Virtual'"
+                    [class.bg-green-100]="cita.modalidad === 'Presencial'"
+                    [class.text-green-800]="cita.modalidad === 'Presencial'">
+                {{cita.modalidad}}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </mat-expansion-panel>
+
+    <!-- Panel de Citas de Mañana -->
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="flex items-center gap-2">
+            <mat-icon>event</mat-icon>
+            <span class="font-medium">Citas de Mañana</span>
+            @if (citasManana.length > 0) {
+              <span class="ml-2 px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
+                {{citasManana.length}}
+              </span>
+            }
+          </div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="space-y-2 mt-2">
+        @if (citasManana.length === 0) {
+          <p class="text-gray-500">No hay citas para mañana</p>
+        }
+        @for (cita of citasManana; track cita.id) {
+          <div class="p-3 rounded-lg cursor-pointer hover:shadow-md transition-all"
+               [style.background-color]="cita.color + '20'"
+               [style.border-left]="'4px solid ' + cita.color"
+               (click)="verDetallesCita(cita)">
+            <div class="flex flex-col">
+              <span class="font-medium">{{cita.asunto}}</span>
+              <span class="text-sm text-gray-600">
+                {{cita.horaInicio | date:'HH:mm'}} - {{cita.horaFin | date:'HH:mm'}}
+              </span>
+              <span class="text-sm text-gray-600">{{cita.nombrePostulante}}</span>
+              <span class="text-xs mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full"
+                    [class.bg-blue-100]="cita.modalidad === 'Virtual'"
+                    [class.text-blue-800]="cita.modalidad === 'Virtual'"
+                    [class.bg-green-100]="cita.modalidad === 'Presencial'"
+                    [class.text-green-800]="cita.modalidad === 'Presencial'">
+                {{cita.modalidad}}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </mat-expansion-panel>
+
+    <!-- Panel de Citas de la Semana -->
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <div class="flex items-center gap-2">
+            <mat-icon>date_range</mat-icon>
+            <span class="font-medium">Citas de la Semana</span>
+            @if (citasSemana.length > 0) {
+              <span class="ml-2 px-2 py-0.5 bg-orange-100 text-orange-800 rounded-full text-xs">
+                {{citasSemana.length}}
+              </span>
+            }
+          </div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="space-y-2 mt-2">
+        @if (citasSemana.length === 0) {
+          <p class="text-gray-500">No hay citas para esta semana</p>
+        }
+        @for (cita of citasSemana; track cita.id) {
+          <div class="p-3 rounded-lg cursor-pointer hover:shadow-md transition-all"
+               [style.background-color]="cita.color + '20'"
+               [style.border-left]="'4px solid ' + cita.color"
+               (click)="verDetallesCita(cita)">
+            <div class="flex flex-col">
+              <span class="font-medium">{{cita.asunto}}</span>
+              <span class="text-sm text-gray-600">
+                {{cita.horaInicio | date:'EEEE d':'':'es'}} • 
+                {{cita.horaInicio | date:'HH:mm'}} - {{cita.horaFin | date:'HH:mm'}}
+              </span>
+              <span class="text-sm text-gray-600">{{cita.nombrePostulante}}</span>
+              <span class="text-xs mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full"
+                    [class.bg-blue-100]="cita.modalidad === 'Virtual'"
+                    [class.text-blue-800]="cita.modalidad === 'Virtual'"
+                    [class.bg-green-100]="cita.modalidad === 'Presencial'"
+                    [class.text-green-800]="cita.modalidad === 'Presencial'">
+                {{cita.modalidad}}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>
+  </div>
+</div>
