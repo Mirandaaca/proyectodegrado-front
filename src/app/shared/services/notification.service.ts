@@ -127,7 +127,8 @@ export class NotificationService {
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
-      }
+      },
+      timer: 1000  // Agregamos un tiempo mínimo de 1 segundo
     });
   }
 

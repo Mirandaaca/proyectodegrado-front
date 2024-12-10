@@ -4,11 +4,11 @@
     <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2">
-          <button mat-icon-button (click)="cambiarMes(-1)">
+          <button mat-icon-button (click)="manejarNavegacion(-1)">
             <mat-icon>chevron_left</mat-icon>
           </button>
           <h2 class="text-xl font-semibold">{{ formatearFechaCabecera() }}</h2>
-          <button mat-icon-button (click)="cambiarMes(1)">
+          <button mat-icon-button (click)="manejarNavegacion(1)">
             <mat-icon>chevron_right</mat-icon>
           </button>
         </div>
@@ -47,6 +47,8 @@
                          [style.top.%]="calcularPosicionTop(cita.horaInicio)"
                          [style.height.%]="calcularAltura(cita.horaInicio, cita.horaFin)"
                          [style.background-color]="cita.color"
+                         [class.opacity-50]="cita.estado === 'Concluida'"
+                         [class.line-through]="cita.estado === 'Concluida'"
                          (click)="verDetallesCita(cita)">
                       <div class="font-medium text-white">{{ cita.asunto }}</div>
                       <div class="text-xs text-white opacity-90">{{ cita.nombrePostulante }}</div>
@@ -89,6 +91,8 @@
                            [style.top.%]="calcularPosicionTop(cita.horaInicio)"
                            [style.height.%]="calcularAltura(cita.horaInicio, cita.horaFin)"
                            [style.background-color]="cita.color"
+                           [class.opacity-50]="cita.estado === 'Concluida'"
+                           [class.line-through]="cita.estado === 'Concluida'"
                            (click)="verDetallesCita(cita)">
                         <div class="font-medium text-white">{{ cita.asunto }}</div>
                         <div class="text-xs text-white opacity-90">{{ cita.nombrePostulante }}</div>
@@ -115,6 +119,7 @@
               <div class="min-h-[120px] p-2 border rounded-lg relative hover:bg-gray-50 transition-colors cursor-pointer"
                    [class.bg-gray-50]="dia.getMonth() !== fechaActual().getMonth()"
                    [class.bg-blue-50]="esFechaActual(dia)"
+                   
                    (click)="navegarADia(dia)">
                 <div class="flex justify-between items-center mb-1">
                   <span class="text-sm font-medium"
@@ -129,6 +134,8 @@
                     <div class="text-xs p-1 rounded cursor-pointer truncate hover:shadow-md transition-shadow"
                          [style.background-color]="cita.color"
                          [style.color]="'white'"
+                         [class.opacity-50]="cita.estado === 'Concluida'"
+                         [class.line-through]="cita.estado === 'Concluida'"
                          (click)="$event.stopPropagation(); verDetallesCita(cita)">
                       {{ cita.horaInicio | date:'HH:mm' }} - {{ cita.asunto }}
                     </div>
@@ -185,7 +192,9 @@
                     [class.bg-blue-100]="cita.modalidad === 'Virtual'"
                     [class.text-blue-800]="cita.modalidad === 'Virtual'"
                     [class.bg-green-100]="cita.modalidad === 'Presencial'"
-                    [class.text-green-800]="cita.modalidad === 'Presencial'">
+                    [class.text-green-800]="cita.modalidad === 'Presencial'"
+                     [class.opacity-50]="cita.estado === 'Concluida'"
+                         [class.line-through]="cita.estado === 'Concluida'">
                 {{cita.modalidad}}
               </span>
             </div>

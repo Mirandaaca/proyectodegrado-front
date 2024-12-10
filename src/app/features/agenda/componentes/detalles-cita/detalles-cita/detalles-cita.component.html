@@ -3,7 +3,14 @@
     <div class="flex justify-between items-start mb-6">
       <div>
         <h2 class="text-2xl font-bold" [style.color]="cita.color">{{ cita.asunto }}</h2>
-        <p class="text-gray-600">{{ cita.estado }}</p>
+        <span class="rounded-full px-3 py-1 text-sm"
+              [ngClass]="{
+                'bg-green-100 text-green-800': cita.estado === 'Pendiente',
+                'bg-yellow-100 text-yellow-800': cita.estado === 'EnProgreso',
+                'bg-blue-100 text-blue-800': cita.estado === 'Concluida'
+              }">
+          {{cita.estado}}
+        </span>
       </div>
       <button mat-icon-button (click)="cerrar()">
         <mat-icon>close</mat-icon>
@@ -39,7 +46,10 @@
           {{ cita.modalidad }}
         </span>
         @if (cita.lugar) {
-          <p class="mt-1 text-gray-600">{{ cita.lugar }}</p>
+          <div>
+            <label class="text-sm font-medium text-gray-600">Lugar</label>
+            <p class="mt-1">{{cita.lugar}}</p>
+          </div>	
         }
       </div>
     </div>
@@ -47,7 +57,7 @@
     <!-- Información del postulante -->
     <div class="mb-6">
       <h3 class="text-sm font-medium text-gray-500 mb-2">Postulante</h3>
-      <div class="p-4 bg-gray-50 rounded-lg">
+      <div class="p-4 bg-yellow-50 rounded-lg">
         <p class="font-medium">{{ cita.nombrePostulante }}</p>
       </div>
     </div>

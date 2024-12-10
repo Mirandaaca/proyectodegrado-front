@@ -247,6 +247,7 @@ export class CrearEditarCitaComponent implements OnInit {
   
       const citaData = {
         id: this.editando ? this.data?.id : undefined,
+        idUsuario: this.obtenerIdUsuario(), // Add this line
         idPostulante: formValue.idPostulante,
         horaInicio: horaInicio.toISOString(),
         horaFin: horaFin.toISOString(),
@@ -256,8 +257,15 @@ export class CrearEditarCitaComponent implements OnInit {
         color: formValue.color
       };
   
-      // En lugar de cerrar el diálogo, emitimos un evento
       this.onSubmit.emit(citaData);
     }
+  }
+  
+  private obtenerIdUsuario(): string {
+    const authData = localStorage.getItem('auth_data');
+    if (authData) {
+      return JSON.parse(authData).idUsuario;
+    }
+    return '';
   }
 }
