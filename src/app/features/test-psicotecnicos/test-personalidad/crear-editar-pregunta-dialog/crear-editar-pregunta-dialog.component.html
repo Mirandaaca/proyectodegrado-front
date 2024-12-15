@@ -1,0 +1,49 @@
+<div class="p-6">
+    <div class="flex justify-between items-start mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">
+        {{ data ? 'Editar' : 'Nueva' }} Pregunta
+      </h2>
+      <button mat-icon-button (click)="cerrar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-4">
+      <!-- Enunciado -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Enunciado de la pregunta</mat-label>
+        <textarea matInput formControlName="enunciado" rows="3" 
+                  placeholder="Escriba la pregunta aquí"></textarea>
+        <mat-error *ngIf="form.get('enunciado')?.hasError('required') && 
+                         form.get('enunciado')?.touched">
+          El enunciado es requerido
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Factor -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Factor</mat-label>
+        <input type="text" matInput formControlName="idFactor"
+               [matAutocomplete]="auto"
+               placeholder="Buscar factor">
+        <mat-autocomplete #auto="matAutocomplete" 
+                        [displayWith]="displayFactor">
+          <mat-option *ngFor="let factor of factores$ | async" 
+                     [value]="factor.id">
+            {{ factor.nombre }} - {{ factor.descripcion }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <!-- Acciones -->
+      <div class="flex justify-end gap-2 pt-4">
+        <button mat-stroked-button type="button" (click)="cerrar()">
+          Cancelar
+        </button>
+        <button mat-flat-button color="primary" type="submit" 
+                [disabled]="!form.valid">
+          {{ data ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>

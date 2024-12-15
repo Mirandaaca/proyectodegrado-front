@@ -1,0 +1,58 @@
+<div class="p-6">
+    <div class="flex justify-between items-start mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">
+        {{ data ? 'Editar' : 'Nueva' }} Respuesta
+      </h2>
+      <button mat-icon-button (click)="cerrar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-4">
+      <!-- Descripción -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="descripcion" rows="2"
+                  placeholder="Escriba la respuesta aquí"></textarea>
+        <mat-error *ngIf="form.get('descripcion')?.hasError('required') && 
+                         form.get('descripcion')?.touched">
+          La descripción es requerida
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Opción -->
+      <mat-form-field appearance="outline">
+        <mat-label>Opción</mat-label>
+        <input matInput formControlName="opcion" placeholder="Ej: A, B, C">
+        <mat-error *ngIf="form.get('opcion')?.hasError('required') && 
+                         form.get('opcion')?.touched">
+          La opción es requerida
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Puntaje -->
+      <mat-form-field appearance="outline">
+        <mat-label>Puntaje</mat-label>
+        <input matInput type="number" formControlName="puntaje" 
+               placeholder="Ingrese el puntaje">
+        <mat-error *ngIf="form.get('puntaje')?.hasError('required') && 
+                         form.get('puntaje')?.touched">
+          El puntaje es requerido
+        </mat-error>
+        <mat-error *ngIf="form.get('puntaje')?.hasError('min')">
+          El puntaje debe ser mayor o igual a 0
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Acciones -->
+      <div class="flex justify-end gap-2 pt-4">
+        <button mat-stroked-button type="button" (click)="cerrar()">
+          Cancelar
+        </button>
+        <button mat-flat-button color="primary" type="submit" 
+                [disabled]="!form.valid">
+          {{ data ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>

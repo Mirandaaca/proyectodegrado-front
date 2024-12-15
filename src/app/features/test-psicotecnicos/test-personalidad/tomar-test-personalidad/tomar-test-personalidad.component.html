@@ -1,0 +1,72 @@
+<div class="container mx-auto py-6 px-4">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">Test de Personalidad</h1>
+          <p class="text-gray-600">
+            {{ esVistaPrevia ? 'Vista Previa' : 'Por favor, responda todas las preguntas' }}
+          </p>
+        </div>
+        <div class="text-gray-600">
+          Página {{ paginaActual + 1 }} de {{ totalPaginas }}
+        </div>
+      </div>
+  
+      @if (esVistaPrevia) {
+        <button mat-flat-button color="primary" (click)="volverAtras()" class="mt-4">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+      }
+    </div>
+  
+    <!-- Preguntas -->
+    <div class="space-y-6">
+      @for (pregunta of preguntas; track pregunta.id) {
+        <div class="bg-white rounded-lg shadow-sm border p-6" [class.animate-fadeIn]="true">
+          <h2 class="text-xl font-medium mb-4">
+            {{pregunta.orden}}. {{pregunta.enunciado}}
+          </h2>
+          
+          <div class="space-y-3">
+            @for (respuesta of pregunta.respuestas; track respuesta.id) {
+              <label class="flex items-center p-3 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors"
+                     [class.bg-blue-50]="esRespuestaSeleccionada(pregunta.id, respuesta.id)">
+                <input type="radio" 
+                       [name]="'pregunta-' + pregunta.id"
+                       [value]="respuesta.id"
+                       [checked]="esRespuestaSeleccionada(pregunta.id, respuesta.id)"
+                       (change)="seleccionarRespuesta(pregunta.id, respuesta)"
+                       class="hidden">
+                <div class="w-10 h-10 flex items-center justify-center rounded-full border-2 mr-4"
+                     [class.border-blue-500]="esRespuestaSeleccionada(pregunta.id, respuesta.id)"
+                     [class.bg-blue-500]="esRespuestaSeleccionada(pregunta.id, respuesta.id)">
+                  <span class="font-medium"
+                        [class.text-white]="esRespuestaSeleccionada(pregunta.id, respuesta.id)">
+                    {{respuesta.opcion}}
+                  </span>
+                </div>
+                <span>{{respuesta.descripcion}}</span>
+              </label>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  
+    <!-- Navegación y botón de enviar -->
+    <div class="flex justify-between items-center mt-6">
+        <button (click)="cambiarPagina(-1)" class="flex items-center gap-2">
+          <mat-icon>chevron_left</mat-icon>
+          Anterior
+        </button>
+      
+        <button *ngIf="preguntas.length === 0" (click)="enviarTest()" class="flex items-center gap-2">
+          Finalizar Test <mat-icon>send</mat-icon>
+        </button>
+      
+        <button *ngIf="preguntas.length > 0" (click)="cambiarPagina(1)" class="flex items-center gap-2">
+          Siguiente <mat-icon>chevron_right</mat-icon>
+        </button>
+    </div>

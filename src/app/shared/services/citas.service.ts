@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Cita } from '../../models/citas/Cita';
 import { RespuestaApi } from '../../models/apiresponses/apiresponse';
@@ -50,7 +50,28 @@ export class CitasService {
   obtenerCitasDelProximoMes(): Observable<RespuestaApi<Cita[]>> {
     return this.http.get<RespuestaApi<Cita[]>>(`${this.baseUrl}/ObtenerCitasDelProximoMes`);
   }
+  obtenerCitasPaginadas(pagina: number, recordsPorPagina: number): Observable<any> {
+    const params = new HttpParams()
+      .set('Pagina', pagina.toString())
+      .set('RecordsPorPagina', recordsPorPagina.toString());
 
+    return this.http.get<Cita[]>(`${this.baseUrl}/ObtenerCitasPaginadas`, {
+      observe: 'response',
+      params
+    }).pipe(
+      map(response => ({
+        citas: response.body ?? [],
+        totalRecords: Number(response.headers.get('cantidad-total-registros') ?? 0)
+      }))
+    );
+  }
+  obtenerCitasEnRango(fechaInicio: Date, fechaFin: Date): Observable<RespuestaApi<Cita[]>> {
+    const params = new HttpParams()
+      .set('fechaInicio', fechaInicio.toISOString())
+      .set('fechaFin', fechaFin.toISOString());
+
+    return this.http.get<RespuestaApi<Cita[]>>(`${this.baseUrl}/ObtenerCitasEnRango`, { params });
+  }
   crearCita(cita: Partial<Cita>): Observable<any> {
     const citaConUsuario = {
       ...cita,

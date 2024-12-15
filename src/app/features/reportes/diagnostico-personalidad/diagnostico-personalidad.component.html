@@ -1,0 +1,104 @@
+<div class="container mx-auto py-6 px-4">
+    <!-- Encabezado -->
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">Diagnósticos Test de Personalidad</h1>
+          <p class="text-gray-600">Listado de diagnósticos y resultados</p>
+        </div>
+        
+        <button mat-raised-button color="primary" (click)="generarReporte()">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Generar Reporte
+        </button>
+      </div>
+    </div>
+  
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+      <form [formGroup]="filtrosForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Búsqueda -->
+        <mat-form-field>
+          <mat-label>Buscar</mat-label>
+          <input matInput formControlName="busqueda" placeholder="Nombre del postulante...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+  
+        <!-- Fecha Inicio -->
+        <mat-form-field>
+          <mat-label>Fecha Inicio</mat-label>
+          <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio">
+          <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+          <mat-datepicker #pickerInicio></mat-datepicker>
+        </mat-form-field>
+  
+        <!-- Fecha Fin -->
+        <mat-form-field>
+          <mat-label>Fecha Fin</mat-label>
+          <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin">
+          <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
+  
+        <!-- Botón Limpiar -->
+        <div class="flex items-center">
+          <button 
+            mat-button 
+            color="warn" 
+            (click)="limpiarFiltros()"
+            class="h-[56px]">
+            <mat-icon>clear</mat-icon>
+            Limpiar Filtros
+          </button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Tabla -->
+    <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+      <table mat-table [dataSource]="diagnosticos" class="w-full">
+        <!-- Postulante Column -->
+        <ng-container matColumnDef="postulante">
+          <th mat-header-cell *matHeaderCellDef> Postulante </th>
+          <td mat-cell *matCellDef="let diagnostico"> {{diagnostico.nombrePostulante}} </td>
+        </ng-container>
+  
+        <!-- Fecha Column -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef> Fecha </th>
+          <td mat-cell *matCellDef="let diagnostico"> 
+            {{diagnostico.fechaCita | date:'dd/MM/yyyy HH:mm'}} 
+          </td>
+        </ng-container>
+  
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="w-20"> Acciones </th>
+          <td mat-cell *matCellDef="let diagnostico">
+            <button 
+              mat-icon-button 
+              color="primary"
+              (click)="verDetalle(diagnostico.idDiagnostico)"
+              matTooltip="Ver detalle">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="['postulante', 'fecha', 'acciones']"></tr>
+        <tr 
+          mat-row 
+          *matRowDef="let row; columns: ['postulante', 'fecha', 'acciones']"
+          class="hover:bg-gray-50 transition-colors cursor-pointer"
+          (click)="verDetalle(row.idDiagnostico)">
+        </tr>
+      </table>
+  
+      <!-- Mensaje cuando no hay datos -->
+      <div 
+        *ngIf="diagnosticos.length === 0" 
+        class="p-8 text-center text-gray-500">
+        No se encontraron diagnósticos con los filtros aplicados
+      </div>
+    </div>
+  </div>

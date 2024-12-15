@@ -1,0 +1,110 @@
+<div class="p-6 bg-white rounded-lg shadow-lg max-w-3xl mx-auto">
+    <div class="flex items-center gap-4 mb-8">
+      <button mat-icon-button routerLink="/app/seguridad/usuarios">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1 class="text-2xl font-bold text-gray-800">
+        {{modelo ? 'Editar' : 'Nuevo'}} Usuario
+      </h1>
+    </div>
+  
+    <form [formGroup]="form" (ngSubmit)="guardarCambios()">
+      <!-- Datos personales -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <mat-form-field>
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombre" required>
+          <mat-error *ngIf="form.get('nombre')?.hasError('required')">
+            El nombre es requerido
+          </mat-error>
+        </mat-form-field>
+  
+        <mat-form-field>
+          <mat-label>Apellido</mat-label>
+          <input matInput formControlName="apellido" required>
+          <mat-error *ngIf="form.get('apellido')?.hasError('required')">
+            El apellido es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+  
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" required type="email">
+          <mat-error *ngIf="form.get('email')?.hasError('required')">
+            El email es requerido
+          </mat-error>
+          <mat-error *ngIf="form.get('email')?.hasError('email')">
+            Ingrese un email válido
+          </mat-error>
+        </mat-form-field>
+  
+        <mat-form-field>
+          <mat-label>Contraseña</mat-label>
+          <input matInput formControlName="password" [type]="mostrarPassword ? 'text' : 'password'" 
+                 [required]="!modelo">
+          <button type="button" mat-icon-button matSuffix (click)="togglePassword()">
+            <mat-icon>{{mostrarPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="form.get('password')?.hasError('required')">
+            La contraseña es requerida
+          </mat-error>
+          <mat-error *ngIf="form.get('password')?.hasError('pattern')">
+            La contraseña debe incluir números, una mayúscula y un caracter especial (*, $ o #)
+          </mat-error>
+          <mat-hint *ngIf="!modelo">
+            La contraseña debe incluir números, una mayúscula y un caracter especial (*, $ o #)
+          </mat-hint>
+        </mat-form-field>
+      </div>
+  
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <mat-form-field>
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="telefono">
+        </mat-form-field>
+  
+        <mat-form-field>
+          <mat-label>Rol</mat-label>
+          <mat-select formControlName="role" required>
+            <mat-option *ngFor="let rol of roles" [value]="rol">
+              {{rol}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('role')?.hasError('required')">
+            El rol es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+  
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <mat-form-field>
+          <mat-label>Dirección</mat-label>
+          <input matInput formControlName="direccion" required>
+          <mat-error *ngIf="form.get('direccion')?.hasError('required')">
+            La dirección es requerida
+          </mat-error>
+        </mat-form-field>
+  
+        <mat-form-field>
+          <mat-label>Fecha de Nacimiento</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="fechaDeNacimiento" required>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="form.get('fechaDeNacimiento')?.hasError('required')">
+            La fecha de nacimiento es requerida
+          </mat-error>
+        </mat-form-field>
+      </div>
+  
+      <div class="flex justify-end gap-4 pt-4">
+        <button type="button" mat-button routerLink="/app/seguridad/usuarios">
+          Cancelar
+        </button>
+        <button type="submit" mat-raised-button color="primary" [disabled]="!form.valid">
+          {{modelo ? 'Actualizar' : 'Guardar'}}
+        </button>
+      </div>
+    </form>
+  </div>

@@ -1,0 +1,121 @@
+<div class="container mx-auto py-6 px-4">
+    <!-- Encabezado -->
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">Test de Raven</h1>
+          <p>Administrar preguntas y respuestas del test</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button mat-button color="primary" (click)="abrirVistaPrevia()">
+            <mat-icon>visibility</mat-icon>
+            Vista Previa
+          </button>
+          <button mat-button color="primary" (click)="enviarTest()">
+            <mat-icon>send</mat-icon>
+            Enviar Test
+          </button>
+          <button mat-raised-button color="primary" (click)="agregarPregunta()">
+            <mat-icon>add</mat-icon>
+            Nueva Pregunta
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Lista de Preguntas -->
+    <div 
+      class="space-y-4"
+      cdkDropList
+      (cdkDropListDropped)="dropPregunta($event)"
+      id="preguntas-list">
+      
+      <div 
+        *ngFor="let pregunta of preguntas"
+        class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow"
+        cdkDrag>
+        
+        <!-- Cabecera de Pregunta -->
+        <div class="p-6 border-b">
+          <div class="flex items-center gap-4">
+            <mat-icon cdkDragHandle class="cursor-move text-gray-400">drag_indicator</mat-icon>
+            
+            <div class="flex-grow">
+              <div class="flex items-center gap-2">
+                <span class="text-lg font-medium">{{ pregunta.orden }}.</span>
+                <span class="text-lg">{{ pregunta.enunciado }}</span>
+              </div>
+              <img [src]="pregunta.rutaImagen" 
+              alt="Figura de la pregunta"
+              class="raven-question-image">
+            </div>
+  
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="editarPregunta(pregunta)">
+                <mat-icon>edit</mat-icon>
+                Editar pregunta
+              </button>
+              <button mat-menu-item class="text-red-600" (click)="eliminarPregunta(pregunta)">
+                <mat-icon class="text-red-600">delete</mat-icon>
+                Eliminar
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+  
+        <!-- Respuestas -->
+        <div class="p-6">
+          <div 
+            class="grid grid-cols-3 gap-4"
+            [id]="'respuestas-list-' + pregunta.id"
+            [cdkDropListData]="pregunta.respuestas"
+            cdkDropList
+            (cdkDropListDropped)="dropRespuesta($event, pregunta)">
+            
+            <div 
+              *ngFor="let respuesta of pregunta.respuestas"
+              class="relative group bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors"
+              cdkDrag>
+              
+              <mat-icon cdkDragHandle class="absolute top-2 right-2 cursor-move text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                drag_indicator
+              </mat-icon>
+  
+              <img  [src]="respuesta.rutaImagen" 
+              alt="Opción de respuesta"
+              class="raven-answer-image">
+            
+            <div class="mt-2 flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <mat-icon class="text-green-500" *ngIf="respuesta.esCorrecta">check_circle</mat-icon>
+                <span class="text-sm text-gray-500">{{ respuesta.puntaje }} puntos</span>
+              </div>
+              
+              <div class="flex gap-2">
+                <button mat-icon-button (click)="editarRespuesta(pregunta, respuesta)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="eliminarRespuesta(pregunta, respuesta)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón Agregar Respuesta -->
+        <button 
+          mat-stroked-button 
+          color="primary" 
+          class="mt-4 w-full"
+          (click)="agregarRespuesta(pregunta)">
+          <mat-icon>add</mat-icon>
+          Agregar Respuesta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

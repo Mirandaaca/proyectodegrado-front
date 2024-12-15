@@ -11,10 +11,18 @@ export class PostulantesService {
   private urlBase = environment.apiURL + '/Postulantes';
   private http = inject(HttpClient);
   constructor() { }
-  obtenerPostulantes(pagina: number, recordsPorPagina: number): Observable<PostulantesResponse> {
-    const params = new HttpParams()
+  obtenerPostulantes(pagina: number, recordsPorPagina: number, filtros?: any): Observable<PostulantesResponse> {
+    let params = new HttpParams()
       .set('Pagina', pagina.toString())
       .set('RecordsPorPagina', recordsPorPagina.toString());
+
+    // Agregar filtros si existen
+    if (filtros?.estado !== undefined && filtros.estado !== null) {
+      params = params.set('habilitado', filtros.estado);
+    }
+    if (filtros?.busqueda) {
+      params = params.set('busqueda', filtros.busqueda);
+    }
 
     return this.http.get<Postulante[]>(this.urlBase + '/ObtenerPostulantes', {
       observe: 'response',
@@ -47,5 +55,8 @@ export class PostulantesService {
         nombre: nombre
       }
     });
+  }
+  cambiarEstado(id: number): Observable<void> {
+    return this.http.put<void>(`${this.urlBase}/CambiarEstadoPostulante?id=${id}`, {});
   }
 }

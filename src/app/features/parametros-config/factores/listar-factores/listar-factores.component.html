@@ -1,0 +1,72 @@
+<div class="bg-white rounded-lg shadow">
+    <div class="flex justify-between items-center p-4 border-b">
+      <div class="flex items-center gap-4">
+        <h1 class="text-xl font-semibold text-gray-800">Factores</h1>
+        <mat-form-field class="w-64" appearance="outline">
+          <mat-label>Buscar factor</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Nombre o descripción">
+          <button *ngIf="searchControl.value" matSuffix mat-icon-button aria-label="Limpiar" (click)="searchControl.reset()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+      <div class="flex gap-2">
+        <button mat-flat-button color="primary" class="flex items-center gap-2" (click)="generarReporte()">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Generar Reporte
+        </button>
+        <button mat-flat-button color="primary" class="flex items-center gap-2" (click)="crearFactor()">
+          <mat-icon>add</mat-icon>
+          Nuevo Factor
+        </button>
+      </div>
+    </div>
+  
+    <div class="overflow-x-auto">
+      <table mat-table [dataSource]="dataSource" matSort class="w-full">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold bg-gray-50 py-3"> ID </th>
+          <td mat-cell *matCellDef="let factor"> {{factor.id}} </td>
+        </ng-container>
+  
+        <!-- Nombre Column -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold bg-gray-50 py-3"> Nombre </th>
+          <td mat-cell *matCellDef="let factor" class="font-medium"> {{factor.nombre}} </td>
+        </ng-container>
+  
+        <!-- Descripcion Column -->
+        <ng-container matColumnDef="descripcion">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold bg-gray-50 py-3"> Descripción </th>
+          <td mat-cell *matCellDef="let factor"> {{factor.descripcion}} </td>
+        </ng-container>
+  
+        <!-- Actions Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="font-semibold bg-gray-50 py-3"> Acciones </th>
+          <td mat-cell *matCellDef="let factor">
+            <div class="flex gap-2">
+              <button mat-icon-button color="primary" (click)="editarFactor(factor)" class="hover:bg-blue-50">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="eliminarFactor(factor.id)" class="hover:bg-red-50">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="columnasAMostrar"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasAMostrar;" @rowAnimation 
+            class="hover:bg-gray-50 transition-colors duration-150"></tr>
+      </table>
+    </div>
+  
+    <mat-paginator [length]="totalRegistros"
+                   [pageSize]="registrosPorPagina"
+                   [pageSizeOptions]="[5, 10, 25, 100]"
+                   showFirstLastButtons
+                   class="border-t">
+    </mat-paginator>
+  </div>

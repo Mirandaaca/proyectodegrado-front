@@ -118,3 +118,55 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   font-weight: 500 !important;
   border-radius: 0.5rem !important;
 }
+/* Ajustar el espacio del label */
+.mat-mdc-form-field-wrapper {
+  padding-bottom: 0 !important;
+}
+
+/* Ajustar el estilo del outline */
+.mat-mdc-form-field-flex {
+  background-color: transparent !important;
+}
+
+/* Eliminar líneas que atraviesan los inputs */
+.mdc-notched-outline__notch {
+  border-right: none !important;
+}
+
+/* Hacer los inputs más compactos */
+.mat-mdc-form-field {
+  line-height: 1.2 !important;
+}
+
+.mat-mdc-text-field-wrapper {
+  padding-bottom: 0 !important;
+}
+
+/* Ajustar la altura de los inputs */
+.mat-mdc-form-field-infix {
+  min-height: 40px !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+/* Estilos para los diálogos de diagnóstico Raven */
+.diagnostico-raven-dialog .mat-mdc-dialog-container {
+  padding: 0;
+}
+
+.imagen-expandida-dialog .mat-mdc-dialog-container {
+  padding: 0;
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.imagen-expandida-dialog img {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Animaciones para imágenes */
+.hover-zoom {
+  transition: transform 0.3s ease;
+}
+
+.hover-zoom:hover {
+  transform: scale(1.05);
+}

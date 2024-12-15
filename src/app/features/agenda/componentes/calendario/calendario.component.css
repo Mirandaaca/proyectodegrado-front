@@ -66,4 +66,58 @@
   .hover-scale:hover {
     @apply transform scale-105;
   }
-  
+  /* calendario.component.css */
+.cita-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 2px;
+  border-radius: 4px;
+  padding: 4px;
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.2s ease;
+}
+
+.cita-container:hover {
+  z-index: 2;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.hora-columna {
+  width: 60px;
+  min-width: 60px;
+  border-right: 1px solid #e5e7eb;
+}
+
+.dia-columna {
+  flex: 1;
+  position: relative;
+  min-height: 60px;
+  border-right: 1px solid #e5e7eb;
+}
+/* Estilos para la vista de lista */
+.table-container {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.table-header-fixed {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+/* Animaciones para el cambio de vista */
+.vista-transition {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.vista-transition.ng-enter {
+  opacity: 0;
+}
+
+.vista-transition.ng-enter-active {
+  opacity: 1;
+}

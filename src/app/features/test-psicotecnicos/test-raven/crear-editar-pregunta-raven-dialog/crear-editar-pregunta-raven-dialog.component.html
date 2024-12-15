@@ -1,0 +1,62 @@
+<div class="p-6">
+    <div class="flex justify-between items-start mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">
+        {{ data ? 'Editar' : 'Nueva' }} Pregunta
+      </h2>
+      <button mat-icon-button (click)="cerrar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <mat-form-field class="w-full">
+        <mat-label>Enunciado</mat-label>
+        <input matInput formControlName="enunciado" required>
+        <mat-error *ngIf="form.get('enunciado')?.hasError('required')">
+          El enunciado es requerido
+        </mat-error>
+      </mat-form-field>
+  
+      <div class="mt-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Imagen de la pregunta
+        </label>
+        <div class="flex items-center gap-4">
+          <button 
+            type="button"
+            mat-stroked-button 
+            (click)="fileInput.click()">
+            <mat-icon>upload</mat-icon>
+            Subir imagen
+          </button>
+          <input 
+            #fileInput
+            type="file" 
+            (change)="onFileSelected($event)"
+            accept="image/*" 
+            class="hidden">
+        </div>
+  
+        <!-- Preview de imagen -->
+        <div *ngIf="imagenPreview" class="mt-4">
+          <img [src]="imagenPreview" class="max-w-lg rounded-lg">
+        </div>
+      </div>
+  
+      <div class="flex justify-end gap-2 pt-4">
+        <button 
+          type="button"
+          mat-button 
+          (click)="cerrar()">
+          Cancelar
+        </button>
+        <button 
+          type="submit"
+          mat-raised-button 
+          color="primary"
+          [disabled]="!form.valid">
+          {{ data ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>

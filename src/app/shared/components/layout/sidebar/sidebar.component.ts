@@ -28,12 +28,41 @@ export class SidebarComponent implements OnInit{
     {
       icon: 'psychology',
       label: 'Test Psicotécnicos',
-      route: '/tests'
+      route: '/tests',
+      subItems: [
+        {
+          icon: 'person_search',
+          label: 'Test de Personalidad',
+          route: 'personalidad'
+        },
+        {
+          icon: 'grid_view',
+          label: 'Test de Raven',
+          route: 'raven'
+        },
+        {
+          icon: 'translate',
+          label: 'Test de Verbalización',
+          route: 'verbalizacion'
+        }
+      ]
     },
     {
       icon: 'analytics',
       label: 'Reportes',
-      route: '/reportes'
+      route: '/reportes/diagnosticos',
+      subItems:[
+        {
+          icon: 'analytics',
+          label: 'Diagnostico del Test de P.',
+          route: 'diagnostico-personalidad'
+        },
+        {
+          icon: 'analytics',
+          label: 'Diagnostico del Test de Raven',
+          route: 'diagnostico-raven'
+        }
+      ]
     },
     {
       icon: 'settings',
@@ -45,13 +74,31 @@ export class SidebarComponent implements OnInit{
           icon: 'person',
           label: 'Postulantes',
           route: 'postulantes'
+        },
+        {
+          icon: 'accessibility',
+          label: 'Factores',
+          route: 'factores'
+        },
+        {
+          icon: 'quiz',
+          label: 'Test Psicotecnicos',
+          route: 'testpsicotecnicos'
         }
       ]
     },
     {
       icon: 'security',
       label: 'Seguridad',
-      route: '/seguridad'
+      route: '/seguridad',
+      expanded: false,
+      subItems: [
+        {
+          icon: 'person',
+          label: 'usuarios',
+          route: 'usuarios'
+        }
+      ]
     }
   ]);
 

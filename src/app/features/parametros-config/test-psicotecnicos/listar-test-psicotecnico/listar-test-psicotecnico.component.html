@@ -1,0 +1,88 @@
+<div class="bg-white rounded-lg shadow" @fadeIn>
+    <!-- Header -->
+    <div class="p-6 border-b">
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold text-gray-800">Tests Psicotécnicos</h1>
+        <div class="flex gap-2">
+          <button mat-flat-button color="primary" class="flex items-center gap-2" (click)="generarReporte()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Generar Reporte
+          </button>
+          <button mat-flat-button color="primary" class="flex items-center gap-2" (click)="crearTest()">
+            <mat-icon>add</mat-icon>
+            Nuevo Test
+          </button>
+        </div>
+      </div>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Buscar test</mat-label>
+        <input matInput [formControl]="searchControl" placeholder="Buscar por nombre o descripción">
+        <button *ngIf="searchControl.value" matSuffix mat-icon-button (click)="searchControl.reset()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table mat-table [dataSource]="dataSource" matSort class="w-full">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold bg-gray-50 py-3"> ID </th>
+          <td mat-cell *matCellDef="let test"> {{test.id}} </td>
+        </ng-container>
+
+        <!-- Nombre Column -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold bg-gray-50 py-3"> Nombre </th>
+          <td mat-cell *matCellDef="let test" class="font-medium"> {{test.nombre}} </td>
+        </ng-container>
+
+        <!-- Descripcion Column -->
+        <ng-container matColumnDef="descripcion">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold bg-gray-50 py-3"> Descripción </th>
+          <td mat-cell *matCellDef="let test"> {{test.descripcion}} </td>
+        </ng-container>
+
+        <!-- Duración Column -->
+        <ng-container matColumnDef="duracion">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold bg-gray-50 py-3"> Duración </th>
+          <td mat-cell *matCellDef="let test"> 
+            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+              {{test.duracion}} minutos
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="font-semibold"> Acciones </th>
+          <td mat-cell *matCellDef="let test">
+            <div class="flex gap-2">
+              <button mat-icon-button color="primary" (click)="editarTest(test)" class="hover:bg-blue-50">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="eliminarTest(test.id!)" class="hover:bg-red-50">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnasAMostrar"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasAMostrar;" 
+            class="hover:bg-gray-50 transition-colors duration-150"
+            @rowAnimation>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      [length]="totalRegistros"
+      [pageSize]="registrosPorPagina"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      showFirstLastButtons
+      class="border-t">
+    </mat-paginator>
+  </div>

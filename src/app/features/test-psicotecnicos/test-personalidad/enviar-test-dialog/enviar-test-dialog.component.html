@@ -1,0 +1,43 @@
+<div class="p-6">
+    <div class="flex justify-between items-start mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Enviar Test de Personalidad</h2>
+      <button mat-icon-button (click)="cerrar()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    @if (postulantes.length === 0) {
+      <div class="text-center py-8">
+        <mat-icon class="text-6xl text-gray-400">person_off</mat-icon>
+        <p class="mt-4 text-gray-600">No hay postulantes disponibles</p>
+      </div>
+    } @else {
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Seleccionar Postulante</mat-label>
+        <mat-select [(ngModel)]="postulanteSeleccionado">
+          @for (postulante of postulantes; track postulante.id) {
+            <mat-option [value]="postulante">
+              <div class="flex flex-col">
+                <span>{{ postulante.nombre }} {{ postulante.apellido }}</span>
+                <span class="text-xs text-gray-500">
+                  Cita: {{ postulante.asuntoCita }} ({{ postulante.estadoCita }})
+                </span>
+              </div>
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <div class="flex justify-end gap-2 mt-6">
+        <button mat-stroked-button (click)="cerrar()">
+          Cancelar
+        </button>
+        <button mat-flat-button 
+                color="primary"
+                [disabled]="!postulanteSeleccionado"
+                (click)="enviar()">
+          Enviar
+        </button>
+      </div>
+    }
+  </div>

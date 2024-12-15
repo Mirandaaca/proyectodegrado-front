@@ -1,0 +1,100 @@
+<div class="container mx-auto py-6 px-4">
+    <!-- Encabezado -->
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">Usuarios</h1>
+          <p class="text-gray-600">Administración de usuarios del sistema</p>
+        </div>
+        
+        <div class="flex gap-2">
+          <button mat-raised-button color="primary" [routerLink]="['crear']">
+            <mat-icon>add</mat-icon>
+            Nuevo Usuario
+          </button>
+          <button mat-stroked-button color="primary" (click)="generarReporte()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Generar Reporte
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+      <mat-form-field class="w-full">
+        <mat-label>Buscar usuario</mat-label>
+        <input matInput [formControl]="busquedaControl" placeholder="Nombre, email...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  
+    <!-- Tabla -->
+    <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+      <table mat-table [dataSource]="usuarios" class="w-full">
+        <!-- Nombre Column -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef> Nombre </th>
+          <td mat-cell *matCellDef="let usuario"> 
+            {{usuario.nombre}} {{usuario.apellido}} 
+            <div class="text-xs text-gray-500">{{usuario.direccion}}</div>
+          </td>
+        </ng-container>
+  
+        <!-- Email Column -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef> Email </th>
+          <td mat-cell *matCellDef="let usuario"> {{usuario.email}} </td>
+        </ng-container>
+  
+        <!-- Role Column -->
+        <ng-container matColumnDef="role">
+          <th mat-header-cell *matHeaderCellDef> Rol </th>
+          <td mat-cell *matCellDef="let usuario">
+            <span class="px-2 py-1 rounded-full text-xs font-medium"
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-800': usuario.role === 'Administrador',
+                    'bg-green-100 text-green-800': usuario.role === 'Usuario'
+                  }">
+              {{usuario.role}}
+            </span>
+          </td>
+        </ng-container>
+  
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="w-24"> Acciones </th>
+          <td mat-cell *matCellDef="let usuario">
+            <div class="flex gap-1">
+              <button 
+                mat-icon-button 
+                color="primary"
+                [routerLink]="['editar', usuario.id]"
+                matTooltip="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="warn"
+                (click)="eliminarUsuario(usuario.id!)"
+                matTooltip="Eliminar">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnas" 
+            class="hover:bg-gray-50 transition-colors"></tr>
+      </table>
+  
+      <!-- Estado vacío -->
+      <div 
+        *ngIf="usuarios.length === 0" 
+        class="p-8 text-center text-gray-500">
+        <mat-icon class="text-6xl mb-4">group_off</mat-icon>
+        <p>No se encontraron usuarios</p>
+      </div>
+    </div>
+  </div>

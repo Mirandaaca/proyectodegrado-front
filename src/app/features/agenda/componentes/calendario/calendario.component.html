@@ -15,6 +15,18 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <mat-button-toggle-group [(value)]="tipoVista">
+          <mat-button-toggle value="calendario" (click)="cambiarTipoVista('calendario')">
+            <mat-icon>calendar_today</mat-icon>
+            <span class="ml-2">Calendario</span>
+          </mat-button-toggle>
+          <mat-button-toggle value="lista" (click)="cambiarTipoVista('lista')">
+            <mat-icon>list</mat-icon>
+            <span class="ml-2">Lista</span>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+
+
         <button mat-button (click)="irAHoy()">Hoy</button>
         <mat-button-toggle-group [value]="vistaActual" (change)="onVistaChange($event)">
           <mat-button-toggle value="dia">Día</mat-button-toggle>
@@ -31,7 +43,8 @@
 
   <!-- Contenedor principal -->
   <div class="flex-1 flex">
-    <!-- Área del calendario -->
+    @if (tipoVista === 'calendario') {
+      <!-- Área del calendario -->
     <div class="flex-1 overflow-auto">
       @if (vistaActual === 'dia') {
         <div class="flex-1 overflow-y-auto">
@@ -87,15 +100,15 @@
                 @for (hora of horasDelDia; track hora) {
                   <div class="relative h-[60px] border-b">
                     @for (cita of obtenerCitasParaHora(hora, dia); track cita.id) {
-                      <div class="absolute left-0 right-0 mx-1 rounded p-2 cursor-pointer hover:shadow-lg transition-all"
+                      <div class="cita-container absolute left-0 right-0 mx-2 rounded p-2 cursor-pointer hover:shadow-lg transition-all"
                            [style.top.%]="calcularPosicionTop(cita.horaInicio)"
                            [style.height.%]="calcularAltura(cita.horaInicio, cita.horaFin)"
                            [style.background-color]="cita.color"
                            [class.opacity-50]="cita.estado === 'Concluida'"
                            [class.line-through]="cita.estado === 'Concluida'"
                            (click)="verDetallesCita(cita)">
-                        <div class="font-medium text-white">{{ cita.asunto }}</div>
-                        <div class="text-xs text-white opacity-90">{{ cita.nombrePostulante }}</div>
+                        <div class="text-white font-medium text-sm truncate">{{ cita.asunto }}</div>
+                        <div class="text-white text-xs opacity-90 truncate" >{{ cita.nombrePostulante }}</div>
                       </div>
                     }
                   </div>
@@ -152,7 +165,161 @@
         </div>
       }
     </div>
-
+    } @else {
+       <!-- Vista de lista -->
+       <div class="flex-1 p-4 overflow-auto">
+        <div class="bg-white p-4 rounded-lg shadow mb-4">
+          <form [formGroup]="filtrosForm" class="bg-white p-4 rounded-lg shadow mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Buscador -->
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar</mat-label>
+                <input matInput formControlName="busqueda" placeholder="Buscar por postulante o asunto">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+      
+              <!-- Modalidad -->
+              <mat-form-field appearance="outline">
+                <mat-label>Modalidad</mat-label>
+                <mat-select formControlName="modalidad">
+                  <mat-option value="">Todas</mat-option>
+                  <mat-option value="Virtual">Virtual</mat-option>
+                  <mat-option value="Presencial">Presencial</mat-option>
+                </mat-select>
+              </mat-form-field>
+      
+              <!-- Estado -->
+              <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="estado">
+                  <mat-option value="">Todos</mat-option>
+                  <mat-option value="Pendiente">Pendiente</mat-option>
+                  <mat-option value="EnProgreso">En Progreso</mat-option>
+                  <mat-option value="Concluida">Concluida</mat-option>
+                </mat-select>
+              </mat-form-field>
+      
+              <!-- Fechas -->
+              <mat-form-field appearance="outline">
+                <mat-label>Fecha Inicio</mat-label>
+                <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio">
+                <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+                <mat-datepicker #pickerInicio></mat-datepicker>
+              </mat-form-field>
+      
+              <mat-form-field appearance="outline">
+                <mat-label>Fecha Fin</mat-label>
+                <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin">
+                <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFin></mat-datepicker>
+              </mat-form-field>
+      
+              <!-- Botones -->
+              <div class="flex items-center gap-2">
+                <button mat-stroked-button color="warn" (click)="limpiarFiltros()">
+                  <mat-icon>clear</mat-icon>
+                  Limpiar
+                </button>
+                <button mat-raised-button color="primary" (click)="generarReporte()">
+                  <mat-icon>picture_as_pdf</mat-icon>
+                  Generar Reporte
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="bg-white rounded-lg shadow">
+          <!-- Tabla de citas -->
+          <table mat-table [dataSource]="dataSource" class="w-full">
+            <!-- Columna Fecha -->
+            <ng-container matColumnDef="fecha">
+              <th mat-header-cell *matHeaderCellDef>Fecha y Hora</th>
+              <td mat-cell *matCellDef="let cita">
+                <div class="text-sm font-medium">
+                  {{cita.horaInicio | date:'EEEE d MMMM':'':'es'}}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{cita.horaInicio | date:'HH:mm'}} - {{cita.horaFin | date:'HH:mm'}}
+                </div>
+              </td>
+            </ng-container>
+    
+            <!-- Columna Asunto -->
+            <ng-container matColumnDef="asunto">
+              <th mat-header-cell *matHeaderCellDef>Asunto</th>
+              <td mat-cell *matCellDef="let cita">
+                <div class="text-sm font-medium" [style.color]="cita.color">{{cita.asunto}}</div>
+              </td>
+            </ng-container>
+    
+            <!-- Columna Postulante -->
+            <ng-container matColumnDef="postulante">
+              <th mat-header-cell *matHeaderCellDef>Postulante</th>
+              <td mat-cell *matCellDef="let cita">{{cita.nombrePostulante}}</td>
+            </ng-container>
+    
+            <!-- Columna Modalidad -->
+            <ng-container matColumnDef="modalidad">
+              <th mat-header-cell *matHeaderCellDef>Modalidad</th>
+              <td mat-cell *matCellDef="let cita">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      [class.bg-blue-100]="cita.modalidad === 'Virtual'"
+                      [class.text-blue-800]="cita.modalidad === 'Virtual'"
+                      [class.bg-green-100]="cita.modalidad === 'Presencial'"
+                      [class.text-green-800]="cita.modalidad === 'Presencial'">
+                  {{cita.modalidad}}
+                </span>
+              </td>
+            </ng-container>
+    
+            <!-- Columna Estado -->
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let cita">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      [ngClass]="{
+                        'bg-green-100 text-green-800': cita.estado === 'Pendiente',
+                        'bg-yellow-100 text-yellow-800': cita.estado === 'EnProgreso',
+                        'bg-blue-100 text-blue-800': cita.estado === 'Concluida'
+                      }">
+                  {{cita.estado}}
+                </span>
+              </td>
+            </ng-container>
+    
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let cita">
+                <div class="flex items-center gap-2">
+                  <button mat-icon-button color="primary" (click)="verDetallesCita(cita)" matTooltip="Ver detalles">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button mat-icon-button color="accent" (click)="editarCita(cita)" matTooltip="Editar">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="eliminarCita(cita.id)" matTooltip="Eliminar">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+    
+            <tr mat-header-row *matHeaderRowDef="columnasMostradas"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnasMostradas;"
+                [class.opacity-50]="row.estado === 'Concluida'"></tr>
+          </table>
+    
+          <mat-paginator
+            [length]="totalRegistros"
+            [pageSize]="registrosPorPagina"
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            (page)="onPageChange($event)">
+          </mat-paginator>
+        </div>
+      </div>
+    }
+    
     <!-- Menú lateral -->
 <div class="w-80 border-l bg-white overflow-y-auto">
   <!-- Acordeón de citas -->
@@ -162,6 +329,7 @@
       <mat-expansion-panel-header>
         <mat-panel-title>
           <div class="flex items-center gap-2">
+            
             <mat-icon>today</mat-icon>
             <span class="font-medium">Citas de Hoy</span>
             @if (citasHoy.length > 0) {
@@ -293,5 +461,5 @@
     </mat-expansion-panel>
   </mat-accordion>
 </div>
-  </div>
+</div>
 </div>

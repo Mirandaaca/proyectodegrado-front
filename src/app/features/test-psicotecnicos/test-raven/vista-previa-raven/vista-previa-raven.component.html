@@ -1,0 +1,94 @@
+<div class="container mx-auto py-6 px-4">
+    <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">Test de Raven</h1>
+          <p class="text-gray-600">Vista Previa</p>
+        </div>
+  
+        <button mat-button color="primary" (click)="volverAtras()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+      </div>
+  
+      <!-- Progreso -->
+      <div class="mt-4 flex items-center gap-4">
+        <div class="flex-grow bg-gray-200 rounded-full h-2">
+          <div 
+            class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            [style.width.%]="((paginaActual + 1) / totalPaginas) * 100">
+          </div>
+        </div>
+        <span class="text-sm text-gray-600">
+          Pregunta {{ paginaActual + 1 }} de {{ totalPaginas }}
+        </span>
+      </div>
+    </div>
+  
+    <!-- Contenido de la Pregunta -->
+    <div class="bg-white rounded-lg shadow-sm border p-6" *ngIf="preguntaActual" @fadeIn>
+      <!-- Enunciado y Figura -->
+      <div class="mb-6">
+        <h2 class="text-xl font-medium mb-4">
+          {{ preguntaActual.orden }}. {{ preguntaActual.enunciado }}
+        </h2>
+        <img 
+          [src]="preguntaActual.rutaImagen" 
+          alt="Figura de la pregunta"
+          class="max-w-2xl mx-auto rounded-lg shadow-lg">
+      </div>
+  
+      <!-- Respuestas -->
+      <div class="grid grid-cols-3 gap-6 mt-8">
+        <div 
+          *ngFor="let respuesta of preguntaActual.respuestas"
+          class="relative cursor-pointer group"
+          (click)="seleccionarRespuesta(preguntaActual.id!, respuesta.id!)">
+          
+          <!-- Marco de selección -->
+          <div 
+            class="absolute inset-0 border-2 rounded-lg transition-colors"
+            [class.border-transparent]="!esRespuestaSeleccionada(preguntaActual.id!, respuesta.id!)"
+            [class.border-blue-500]="esRespuestaSeleccionada(preguntaActual.id!, respuesta.id!)"
+            [class.bg-blue-50]="esRespuestaSeleccionada(preguntaActual.id!, respuesta.id!)">
+          </div>
+  
+          <img 
+            [src]="respuesta.rutaImagen" 
+            alt="Opción de respuesta"
+            class="w-full rounded-lg shadow hover:shadow-md transition-shadow">
+        </div>
+      </div>
+    </div>
+  
+    <!-- Navegación -->
+    <div class="flex justify-between items-center mt-6">
+      <button 
+        mat-button
+        color="primary"
+        [disabled]="esPrimeraPagina"
+        (click)="cambiarPagina(-1)">
+        <mat-icon>chevron_left</mat-icon>
+        Anterior
+      </button>
+  
+      <button 
+        *ngIf="!esUltimaPagina"
+        mat-button
+        color="primary"
+        (click)="cambiarPagina(1)">
+        Siguiente
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+  
+      <button 
+        *ngIf="esUltimaPagina"
+        mat-raised-button
+        color="primary"
+        (click)="finalizar()">
+        Finalizar
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+  </div>

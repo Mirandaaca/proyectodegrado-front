@@ -6,16 +6,28 @@ import { MatButtonModule } from '@angular/material/button';
 import { CitasService } from '../../../../shared/services/citas.service';
 import { Cita } from '../../../../models/citas/Cita';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { DetallesCitaComponent } from '../detalles-cita/detalles-cita/detalles-cita.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CrearEditarCitaComponent } from '../crear-editar-cita/crear-editar-cita.component';
 import localeEs from '@angular/common/locales/es';
 import { MenuLateralComponent } from "../menu-lateral/menu-lateral/menu-lateral.component";
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { RouterModule } from '@angular/router';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { PdfCalendarioService } from '../../../../shared/services/pdf-calendario.service';
 registerLocaleData(localeEs);
 
 @Component({
@@ -23,11 +35,24 @@ registerLocaleData(localeEs);
   standalone: true,
   imports: [CommonModule,
     FormsModule,
+    ReactiveFormsModule,
+    MatIconModule,
     MatButtonModule,
     MatButtonToggleModule,
-    MatIconModule,
     MatExpansionModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatDialogModule,
+    MatTooltipModule,
     MatSnackBarModule,
+    DragDropModule,
+    RouterModule
   ],
   templateUrl: './calendario.component.html',
   styleUrl: './calendario.component.css',
@@ -48,11 +73,52 @@ registerLocaleData(localeEs);
 })
 
 export class CalendarioComponent implements OnInit {
+  private pdfService = inject(PdfCalendarioService)
+  private fb = inject(FormBuilder);
+  constructor(private dialog: MatDialog) {
+    // Efecto para cargar las citas según la vista
+    effect(() => {
+      const fecha = this.fechaActual();
+      switch (this.vistaActual) {
+        case 'dia':
+          this.cargarCitasDelDia();
+          break;
+        case 'semana':
+          this.cargarCitasDeLaSemana();
+          break;
+        case 'mes':
+          this.cargarCitasDelMes();
+          break;
+      }
+    });
+    this.cargarCitasMenuLateral();
+    this.setupFiltros();
+    
+  }
+  filtrosForm = this.fb.group({
+    busqueda: [''],
+    modalidad: [''],
+    estado: [''],
+    fechaInicio: [null],
+    fechaFin: [null]
+  });
+  tipoVista: 'calendario' | 'lista' = 'calendario';
+  dataSource = new MatTableDataSource<Cita>([]);
+  totalRegistros = 0;
+  paginaActual = 1;
+  registrosPorPagina = 10;
   
+  columnasMostradas = [
+    'fecha',
+    'asunto',
+    'postulante',
+    'modalidad',
+    'estado',
+    'acciones'
+  ];
   private citasService = inject(CitasService);
   
   private notificationService = inject(NotificationService);
-  
   @Input() vistaActual: 'dia' | 'semana' | 'mes' = 'mes';
   
   @Output() vistaActualChange = new EventEmitter<'dia' | 'semana' | 'mes'>();
@@ -64,6 +130,11 @@ export class CalendarioComponent implements OnInit {
   citasManana: Cita[] = [];
 
   citasSemana: Cita[] = [];
+  onPageChange(event: PageEvent) {
+    this.paginaActual = event.pageIndex + 1;
+    this.registrosPorPagina = event.pageSize;
+    this.cargarCitasPaginadas();
+  }
   
   trackByHora(_index: number, hora: number): number {
     return hora;
@@ -80,7 +151,47 @@ export class CalendarioComponent implements OnInit {
   trackByCita(_index: number, cita: Cita): number {
     return cita.id;
   }
- 
+  cambiarTipoVista(vista: 'calendario' | 'lista') {
+    this.tipoVista = vista;
+    if (vista === 'lista') {
+      this.cargarCitasPaginadas();
+    } else {
+      this.cargarCitasSegunVista();
+    }
+  }
+  cargarTodasLasCitas() {
+    this.citasService.obtenerCitas().subscribe({
+      next: (response) => {
+        if (response.succeded) {
+          this.citas.set(response.data);
+        }
+      }
+    });
+  }
+  async generarReporte() {
+    this.notificationService.showLoading('Generando reporte...');
+    try {
+      let citas: Cita[] = [];
+      
+      // Si hay filtros aplicados, usar los datos filtrados
+      if (this.dataSource.filteredData.length > 0) {
+        citas = this.dataSource.filteredData;
+      } else {
+        // Si no hay filtros, obtener todas las citas
+        const response = await this.citasService.obtenerCitas().toPromise();
+        if (response?.succeded) {
+          citas = response.data;
+        }
+      }
+
+      await this.pdfService.generarReporteCitas(citas, this.filtrosForm.value);
+      this.notificationService.success('Reporte generado correctamente');
+    } catch (error) {
+      this.notificationService.error('Error al generar el reporte');
+    } finally {
+      this.notificationService.closeLoading();
+    }
+  }
   // Método para crear cita
  crearNuevaCita() {
   const dialogRef = this.dialog.open(CrearEditarCitaComponent, {
@@ -99,6 +210,7 @@ export class CalendarioComponent implements OnInit {
           this.notificationService.success('¡Cita creada correctamente!');
           this.cargarCitas();
           this.cargarCitasMenuLateral();
+          this.cargarCitasPaginadas();
           dialogRef.close(); // Solo cerramos si fue exitoso
         } else {
           this.notificationService.handleBackendError(response);
@@ -174,11 +286,12 @@ export class CalendarioComponent implements OnInit {
   });
 
   onVistaChange(event: any) {
-    this.vistaActual = event.value;
-    this.vistaActualChange.emit(this.vistaActual);
-    this.cargarCitasSegunVista();
+    if (this.tipoVista === 'calendario') {
+      this.vistaActual = event.value;
+      this.vistaActualChange.emit(this.vistaActual);
+      this.cargarCitasSegunVista();
+    }
   }
-
   cargarCitasSegunVista() {
     switch(this.vistaActual) {
       case 'dia':
@@ -322,25 +435,72 @@ export class CalendarioComponent implements OnInit {
     });
   });
 
-  constructor(private dialog: MatDialog) {
-    // Efecto para cargar las citas según la vista
-    effect(() => {
-      const fecha = this.fechaActual();
-      switch (this.vistaActual) {
-        case 'dia':
-          this.cargarCitasDelDia();
-          break;
-        case 'semana':
-          this.cargarCitasDeLaSemana();
-          break;
-        case 'mes':
-          this.cargarCitasDelMes();
-          break;
-      }
+  
+  private setupFiltros() {
+    this.filtrosForm.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.paginaActual = 1;
+      this.cargarCitasFiltradas();
     });
-    this.cargarCitasMenuLateral();
   }
-
+  limpiarFiltros() {
+    this.filtrosForm.reset({
+      busqueda: '',
+      modalidad: '',
+      estado: '',
+      fechaInicio: null,
+      fechaFin: null
+    });
+    this.cargarCitasPaginadas();
+  }
+  cargarCitasFiltradas() {
+    const filtros = this.filtrosForm.value;
+    
+    if (filtros.fechaInicio && filtros.fechaFin) {
+      this.citasService.obtenerCitasEnRango(filtros.fechaInicio, filtros.fechaFin)
+        .subscribe(response => {
+          if (response.succeded) {
+            this.dataSource.data = response.data;
+            this.totalRegistros = response.data.length;
+            this.aplicarFiltrosAdicionales();
+          }
+        });
+    } else {
+      this.cargarCitasPaginadas();
+    }
+  }
+  cargarCitasPaginadas() {
+    this.citasService.obtenerCitasPaginadas(this.paginaActual, this.registrosPorPagina)
+      .subscribe(response => {
+        this.dataSource.data = response.citas;
+        this.totalRegistros = response.totalRecords;
+        this.aplicarFiltrosAdicionales();
+      });
+  }
+  private aplicarFiltrosAdicionales() {
+    const filtros = this.filtrosForm.value;
+    
+    this.dataSource.filterPredicate = (cita: Cita, _: string) => {
+      // Filtro por búsqueda
+      const searchTerm = filtros.busqueda?.toLowerCase() || '';
+      const matchBusqueda = !searchTerm || 
+        cita.nombrePostulante?.toLowerCase().includes(searchTerm) ||
+        cita.asunto.toLowerCase().includes(searchTerm);
+  
+      // Filtro por modalidad
+      const matchModalidad = !filtros.modalidad || cita.modalidad === filtros.modalidad;
+  
+      // Filtro por estado
+      const matchEstado = !filtros.estado || cita.estado === filtros.estado;
+  
+      return matchBusqueda && matchModalidad && matchEstado;
+    };
+  
+    // Trigger del filtro
+    this.dataSource.filter = 'trigger';
+  }
   cargarCitasMenuLateral()  {
     this.citasService.obtenerCitasDeHoy().subscribe({
       next: (response) => {
@@ -373,13 +533,17 @@ export class CalendarioComponent implements OnInit {
    // Métodos para calcular posición y tamaño de las citas
    calcularPosicionTop(horaInicio: string | Date): number {
     const fecha = new Date(horaInicio);
-    return (fecha.getMinutes() / 60) * 100;
+    const minutos = fecha.getMinutes();
+    const porcentaje = (minutos / 60) * 100;
+    return porcentaje;
   }
 
   calcularAltura(horaInicio: string | Date, horaFin: string | Date): number {
-    const inicio = new Date(horaInicio).getTime();
-    const fin = new Date(horaFin).getTime();
-    return ((fin - inicio) / (1000 * 60 * 60)) * 100;
+    const inicio = new Date(horaInicio);
+    const fin = new Date(horaFin);
+    const duracionMinutos = (fin.getTime() - inicio.getTime()) / (1000 * 60);
+    const porcentaje = (duracionMinutos / 60) * 100;
+    return porcentaje;
   }
 
   cargarCitas() {
@@ -393,10 +557,18 @@ export class CalendarioComponent implements OnInit {
   }
 
   cargarCitasDelDia() {
-    this.citasService.obtenerCitasDeHoy().subscribe({
+    const fecha = this.fechaActual();
+    this.citasService.obtenerCitas().subscribe({
       next: (response) => {
         if (response.succeded) {
-          this.citas.set(response.data);
+          // Filtrar las citas para el día específico
+          const citasDelDia = response.data.filter(cita => {
+            const fechaCita = new Date(cita.horaInicio);
+            return fechaCita.getDate() === fecha.getDate() &&
+                   fechaCita.getMonth() === fecha.getMonth() &&
+                   fechaCita.getFullYear() === fecha.getFullYear();
+          });
+          this.citas.set(citasDelDia);
         }
       }
     });
@@ -444,19 +616,17 @@ export class CalendarioComponent implements OnInit {
 
   // Actualizar método para obtener citas por hora
   obtenerCitasParaHora(hora: number, fecha: Date): Cita[] {
-    
     return this.citas().filter(cita => {
-
-      
       const fechaCita = new Date(cita.horaInicio);
       const horaCita = fechaCita.getHours();
       
-      return horaCita === hora &&
-             fechaCita.getDate() === fecha.getDate() &&
-             fechaCita.getMonth() === fecha.getMonth() &&
-             fechaCita.getFullYear() === fecha.getFullYear();
+      // Comparar fecha completa
+      const mismoAnio = fechaCita.getFullYear() === fecha.getFullYear();
+      const mismoMes = fechaCita.getMonth() === fecha.getMonth();
+      const mismoDia = fechaCita.getDate() === fecha.getDate();
+      
+      return horaCita === hora && mismoAnio && mismoMes && mismoDia;
     });
-
   }
 
   formatearHora(hora: number): string {
@@ -514,7 +684,7 @@ export class CalendarioComponent implements OnInit {
     });
   }
 
-  private async eliminarCita(id: number) {
+  public async eliminarCita(id: number) {
     const confirmar = await this.notificationService.confirm(
       '¿Estás seguro?',
       'Esta acción no se puede deshacer'
@@ -529,6 +699,7 @@ export class CalendarioComponent implements OnInit {
             this.notificationService.success('¡Cita eliminada correctamente!');
             this.cargarCitas();
             this.cargarCitasMenuLateral();
+            this.cargarCitasPaginadas();
           },
           error: () => {
             this.notificationService.closeLoading();
